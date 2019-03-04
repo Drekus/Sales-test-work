@@ -23,16 +23,16 @@ namespace Sales.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddToOrder(int bookId, int amount=1, int page = 1)
+        public async Task<IActionResult> AddToOrder(int bookId, int page = 1)
         {
-            var model = await _salesService.AddToOrder(HttpContext, page, bookId, amount);
+            var model = await _salesService.AddToOrder(HttpContext, page, bookId);
             return View("Index", model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveFromOrder(int bookId, int amount=1, int page = 1)
+        public async Task<IActionResult> RemoveFromOrder(int bookId, int page = 1)
         {
-            var model = await _salesService.RemoveFromOrder(HttpContext, page, bookId, amount);
+            var model = await _salesService.RemoveFromOrder(HttpContext, page, bookId);
             return View("Index", model);
         }
 

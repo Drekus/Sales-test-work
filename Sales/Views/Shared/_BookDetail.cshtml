@@ -1,0 +1,43 @@
+﻿@model Sales.Models.DataModels.Book
+<div>
+    <h4>@Html.DisplayFor(model => model.Author). @Html.DisplayFor(model => model.Title)</h4>
+    <br />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ISBN)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ISBN)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Author)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Author)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PublishingYear)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PublishingYear)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Price) рублей
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Quantity)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Quantity)
+        </dd>
+    </dl>
+</div>

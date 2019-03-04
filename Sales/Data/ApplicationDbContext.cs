@@ -86,7 +86,7 @@ namespace Sales.Data
                 {
                     Id = 6,
                     Title = "Внутреннее устройство Windows",
-                    Author = " Соломон Дэвид, Руссинович Марк, Ионеску Алекс , Йосифович Павел",
+                    Author = "Соломон Дэвид, Руссинович Марк, Ионеску Алекс, Йосифович Павел",
                     ISBN = "978-5-4461-0663-9",
                     PublishingYear = 2018,
                     Price = 1800,
@@ -206,7 +206,5 @@ namespace Sales.Data
 
             #endregion
         }
-
-        public DbSet<Sales.Models.DataModels.OrderedBook> OrderedBook { get; set; }
     }
 }

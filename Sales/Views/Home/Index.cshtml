@@ -1,4 +1,5 @@
 ﻿@model Sales.Models.ViewModels.MainViewModel
+@addTagHelper "*, Sales"
 @{
     Context.Request.Cookies.TryGetValue("SalesPromoCode", out string promoCode);
     ViewData["Title"] = "Распродажа книг";
@@ -7,15 +8,97 @@
 <partial name="_ErrorPanel" model="Model" />
 <div class="row">
     <div class="col-md-6">
-        @if (Model.BooksPageViewModel!=null && Model.BooksPageViewModel.HasBooks)
+        @if (Model.BooksPageViewModel != null && Model.BooksPageViewModel.HasBooks)
         {
-            <partial name="Books/_BooksPage" model="@Model.BooksPageViewModel" />       
+            <h2>Оставшиеся книги</h2>
+            <div>
+                <ul>
+                    @foreach (var book in Model.BooksPageViewModel.Books)
+                    {
+                        <li>
+                            <div>
+                                <partial name="_BookDetail" model="book" />
+                                @if (!string.IsNullOrWhiteSpace(promoCode))
+                                {
+                                    <div>
+                                        <form asp-controller="Home" asp-action="AddToOrder" method="post" class="form-horizontal">
+                                            <div class="form-group">
+                                                <div style="float: right;">
+                                                    <input type="number" class="hide" name="bookId" value="@book.Id" />
+                                                    <input type="hidden" class="hide" name="page" value="@Model.BooksPageViewModel?.PageNumber" />
+                                                    <button type="submit" class="btn btn-sm btn-info">Добавить в заказ</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                }
+                                <hr />
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <page-link page-model="@Model.BooksPageViewModel" page-action="Index"></page-link>
         }
     </div>
     <div class="col-md-6">
-        @if (Model.UserOrder != null)
+        @if (Model.UserOrder != null && Model.UserOrder.HasOrderedBooks)
         {
-            <partial name="Order/_UserOrder" model="Model.UserOrder" />
+            <h2>Ваш заказ</h2>
+            <ul>
+                @foreach (var orderedBook in Model.UserOrder.OrderedBooks)
+                {
+                    <li>
+                        <div>
+                            <partial name="_BookDetail" model="@orderedBook.Book" />
+                            @if (!Model.UserOrder.IsСheckouted)
+                            {
+                                <form asp-controller="Home" asp-action="RemoveFromOrder" method="post" class="form-horizontal">
+                                    <div class="form-group">
+                                        <input type="number" class="hide" name="bookId" value="@orderedBook.BookId" />
+                                        <input type="hidden" class="hide" name="page" value="@Model.BooksPageViewModel?.PageNumber" />
+                                        <div style="float: right;">
+                                            <button type="submit" class="btn btn-sm btn-danger">Удалить из заказа</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            }
+                            <hr />
+                        </div>
+                    </li>
+                }
+            </ul>
+            <div>
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.UserOrder.TotalCost)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.UserOrder.TotalCost)
+                    </dd>
+                </dl>
+            </div>
+            <div>
+                <form asp-controller="Home" asp-action="Сheckout" method="post" class="form-horizontal">
+                    <div class="form-group">
+                        <input type="hidden" class="hide" name="page" value="@Model.BooksPageViewModel?.PageNumber" />
+                        <div align="center">
+                            @if (!Model.UserOrder.IsValid)
+                            {
+                                <button type="submit" disabled class="btn btn-success" title="Сумма заказа должна превышать 2000 рублей">Оформить заказ</button>
+                            }
+                            else if (Model.UserOrder.IsСheckouted)
+                            {
+                                <button type="submit" disabled class="btn btn-success" title="Заказ оформлен. 1 промокод позволяет мделать только 1 заказ.">Оформить заказ</button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-success">Оформить заказ</button>
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
         }
         else if (string.IsNullOrWhiteSpace(promoCode))
         {

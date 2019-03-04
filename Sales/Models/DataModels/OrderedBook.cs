@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace Sales.Models.DataModels
+﻿namespace Sales.Models.DataModels
 {
     public class OrderedBook
     {
@@ -10,11 +7,5 @@ namespace Sales.Models.DataModels
 
         public int BookId { get; set; }
         public Book Book { get; set; }
-
-        [Display(Name = "Количество")]
-        public int BookAmount { get; set; }
-
-        [Display(Name = "Стоимость")]
-        public decimal Cost => Math.Round(Book.Price * BookAmount, 2);
     }
 }

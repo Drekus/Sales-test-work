@@ -17,8 +17,9 @@ namespace Sales.Models.DataModels
         public ICollection<OrderedBook> OrderedBooks { get; set; } = new List<OrderedBook>();
 
         [Display(Name = "Итоговая стоимость")]
-        public decimal TotalCost => Math.Round(OrderedBooks.Sum(b=>b.Cost), 2);
+        public decimal TotalCost => Math.Round(OrderedBooks.Sum(b=>b.Book.Price), 2);
 
         public bool IsValid => TotalCost >= 2000;
+        public bool HasOrderedBooks => OrderedBooks.Count > 0;
     }
 }

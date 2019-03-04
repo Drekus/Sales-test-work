@@ -36,17 +36,11 @@ namespace Sales.Services
             return model;
         }
 
-        public async Task<MainViewModel> AddToOrder(HttpContext httpContext, int page, int bookId, int amount)
+        public async Task<MainViewModel> AddToOrder(HttpContext httpContext, int page, int bookId)
         {
             MainViewModel model = await GetModelForUser(httpContext, page);
             if (model.HaveError)
                 return model;
-
-            if (amount < 1)
-            {
-                model.ErrorMessage = "Вы не можете купить менее 1 книги";
-                return model;
-            }
 
             Book book = await _db.Books.FindAsync(bookId);
             if (book == null)
@@ -55,29 +49,26 @@ namespace Sales.Services
                 return model;
             }
 
+            if (book.Quantity < 1)
+            {
+                model.ErrorMessage = $"Извините, данная книга закончилась.";
+                return model;
+            }
+
             if (model.UserOrder == null)
             {
-                if (amount > book.Quantity)
-                {
-                    model.ErrorMessage = $"Вы не можете купить книг больше чем, их осталось на складе. На складе {book.Quantity} книг.";
-                    return model;
-                }
-
                 model.UserOrder = new Order {PromoCodeValue = model.UserPromoCode };
                 model.UserOrder.OrderedBooks = new List<OrderedBook>
                 {
                     new OrderedBook
                     {
                         Order = model.UserOrder,
-                        Book = book,
-                        BookAmount = amount
+                        Book = book
                     }
                 };
 
                 _db.Orders.Add(model.UserOrder);
                 await _db.SaveChangesAsync();
-
-                model.UserOrder = await GetUserOrder(model.UserPromoCode);
                 return model;
             }
 
@@ -88,44 +79,29 @@ namespace Sales.Services
             }
            
             OrderedBook orderedBook = model.UserOrder.OrderedBooks.FirstOrDefault(ob => ob.BookId == bookId);
-            if (orderedBook == null)
+            if (orderedBook != null)
             {
-                orderedBook = new OrderedBook
-                {
-                    Order = model.UserOrder,
-                    Book = book,
-                    BookAmount = amount
-                };
-                model.UserOrder.OrderedBooks.Add(orderedBook);
+                model.ErrorMessage = "Вы уже заказали данную книгу.";
+                return model;               
             }
-            else
+
+            orderedBook = new OrderedBook
             {
-                orderedBook.BookAmount += amount;
-            }
-           
-            if (orderedBook.BookAmount > book.Quantity)
-            {
-                model.ErrorMessage = $"Вы не можете купить книг больше чем, их осталось на складе. На складе {book.Quantity} книг.";
-                return model;
-            }
+                Order = model.UserOrder,
+                Book = book
+            };
+            model.UserOrder.OrderedBooks.Add(orderedBook);
+
             _db.Orders.Update(model.UserOrder);
             await _db.SaveChangesAsync();
-
-            model.UserOrder = await GetUserOrder(model.UserPromoCode);
             return model;
         }
 
-        public async Task<MainViewModel> RemoveFromOrder(HttpContext httpContext, int page, int bookId, int amount)
+        public async Task<MainViewModel> RemoveFromOrder(HttpContext httpContext, int page, int bookId)
         {
             MainViewModel model = await GetModelForUser(httpContext, page);
             if (model.HaveError)
                 return model;
-
-            if (amount < 1)
-            {
-                model.ErrorMessage = "Вы не можете убрать из заказа менее 1 книги";
-                return model;
-            }
 
             if (model.UserOrder == null)
             {
@@ -146,14 +122,9 @@ namespace Sales.Services
                 return model;
             }
 
-            orderedBook.BookAmount -= amount;
-            if (orderedBook.BookAmount <= 0)
-                model.UserOrder.OrderedBooks.Remove(orderedBook);
-
+            model.UserOrder.OrderedBooks.Remove(orderedBook);          
             _db.Orders.Update(model.UserOrder);
             await _db.SaveChangesAsync();
-
-            model.UserOrder = await GetUserOrder(model.UserPromoCode);
             return model;
         }
 
@@ -184,12 +155,18 @@ namespace Sales.Services
             model.UserOrder.IsСheckouted = true;
             foreach (var ob in model.UserOrder.OrderedBooks)
             {
-                ob.Book.Quantity -= ob.BookAmount;
+                if (ob.Book.Quantity < 1)
+                {
+                    model.ErrorMessage = $"Извините. Книга '{ob.Book.Title}' закончилась на складе. Она была удалена из вашего заказа.";
+                    model.UserOrder.OrderedBooks.Remove(ob);
+                    break;
+                }
+                ob.Book.Quantity -= 1;
             }
             _db.Orders.Update(model.UserOrder);
             await _db.SaveChangesAsync();
 
-            model.UserOrder = await GetUserOrder(model.UserPromoCode);
+            model = await GetModelForUser(httpContext, page);
             return model;
         }
 
