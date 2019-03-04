@@ -1,0 +1,23 @@
+﻿@{
+    Context.Request.Cookies.TryGetValue("SalesPromoCode", out string promoCode);
+}
+
+@if (!string.IsNullOrWhiteSpace(promoCode))
+{
+    <form asp-controller="Authentication" asp-action="Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" method="post" id="logoutForm" class="navbar-right">
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <p class="navbar-text">Ваш промокод: @promoCode</p>
+            </li>
+            <li>
+                <button type="submit" class="btn btn-link navbar-btn navbar-link">Выйти</button>
+            </li>
+        </ul>
+    </form>
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li><a asp-controller="Authentication" asp-action="Index">Войти</a></li>
+    </ul>
+}

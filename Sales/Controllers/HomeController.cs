@@ -1,43 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Sales.Models;
+using Sales.Models.ViewModels;
+using Sales.Services;
 
 namespace Sales.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private SalesService _salesService;
+
+        public HomeController(SalesService salesService)
         {
-            return View();
+            _salesService = salesService;
         }
 
-        public IActionResult About()
+        [HttpGet]
+        public async Task<IActionResult> Index(int page = 1)
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
+            var model = await _salesService.GetModel(HttpContext, page);
+            return View(model);
         }
 
-        public IActionResult Contact()
+        [HttpPost]
+        public async Task<IActionResult> AddToOrder(int bookId, int amount=1, int page = 1)
         {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
+            var model = await _salesService.AddToOrder(HttpContext, page, bookId, amount);
+            return View("Index", model);
         }
 
-        public IActionResult Privacy()
+        [HttpPost]
+        public async Task<IActionResult> RemoveFromOrder(int bookId, int amount=1, int page = 1)
         {
-            return View();
+            var model = await _salesService.RemoveFromOrder(HttpContext, page, bookId, amount);
+            return View("Index", model);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpPost]
+        public async Task<IActionResult> Сheckout(int page = 1)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var model = await _salesService.Сheckout(HttpContext, page);
+            return View("Index", model);
         }
     }
 }

@@ -1,0 +1,14 @@
+﻿@model Sales.Models.ViewModels.BooksPageViewModel
+@addTagHelper "*, Sales"
+<div>
+    <h2>Оставшиеся книги</h2>
+    <div>
+        <ul>
+            @foreach (var book in Model.Books)
+            {
+            <li><partial name="Books/_BookDetail" model="book" /></li>
+            }
+        </ul>
+    </div>
+    <page-link page-model="@Model" page-action="Index"></page-link>
+</div>

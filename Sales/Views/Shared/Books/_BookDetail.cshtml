@@ -1,0 +1,65 @@
+﻿@model Sales.Models.DataModels.Book
+@{
+    Context.Request.Cookies.TryGetValue("SalesPromoCode", out string promoCode);
+}
+
+<div>
+    <div>
+        <h4>@Html.DisplayFor(model => model.Author). @Html.DisplayFor(model => model.Title)</h4>
+        <br />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.ISBN)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.ISBN)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Title)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Author)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Author)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.PublishingYear)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.PublishingYear)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Price) рублей
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Quantity)
+            </dd>
+        </dl>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(promoCode))
+    {
+        <div>
+            <form asp-controller="Home" asp-action="AddToOrder" method="post" class="form-horizontal">
+                <div class="form-group">
+                    <div style="float: right;">
+                        <input type="number" class="hide" name="bookId" value="@Model.Id" />
+                        <input type="hidden" class="hide" name="page" value="@ViewData["PageNumber"]" />
+                        <button type="submit" class="btn btn-sm btn-info">Добавить в заказ</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+    <hr />
+</div>

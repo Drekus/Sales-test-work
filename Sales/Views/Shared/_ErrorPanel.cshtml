@@ -1,0 +1,15 @@
+﻿@model Sales.Models.ViewModels.BaseViewModel
+@if (Model.HaveError)
+{
+    <br />
+    <div class="col-md-offset-2 col-md-8">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h4 class="text-center">Ошибка!</h4>
+            </div>
+            <div class="panel-body">
+                <h3 class="text-danger">@Model.ErrorMessage</h3>
+            </div>
+        </div>
+    </div>
+}
